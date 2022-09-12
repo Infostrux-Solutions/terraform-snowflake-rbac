@@ -3,6 +3,22 @@ Quickly deploy Snowflake resources using a simple configuration model.
 
 ## Usage
 
+### Connecting to Snowflake
+
+Add the following configuration to your `terraform.tfvars` file using your personal credentials,
+
+```hcl
+snowflake_account                = "ab12345.ca-central-1.aws"
+snowflake_username               = "Craig"
+snowflake_private_key_path       = "~/.local/share/snowflake/rsa_key.p8"
+snowflake_private_key_passphrase = "supersecretpassphrase"
+snowflake_role                   = "ACCOUNTADMIN"
+```
+
+The Snowflake Terraform provider uses private key authentication so this must be setup before you are able to deploy resources to the Snowflake account. More information on setting up a private key pair for Snowflake can be found here: https://docs.snowflake.com/en/user-guide/key-pair-auth.html
+
+### Configuring Resources
+
 Copy the `terraform.tfvars.example` file to `terraform.tfvars` and populate it with your desired Snowflake environment. For example,
 
 ```hcl
