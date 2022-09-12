@@ -1,6 +1,39 @@
 # terraform-snowflake-X
 Quickly deploy Snowflake resources using a simple configuration model.
 
+## Usage
+
+Copy the `terraform.tfvars.example` file to `terraform.tfvars` and populate it with your desired Snowflake environment. For example,
+
+```hcl
+environments = [
+  "DEV",
+  "PROD",
+]
+data_stages = [
+  "INGEST",
+  "CLEAN",
+  "NORMALIZE",
+  "INTEGRATE",
+  "ANALYZE",
+]
+user_grants = {
+  "DBT_CLOUD" = ["CICD"]
+}
+role_grants = {
+  "DBA"       = ["CICD"]
+  "CICD"      = ["ETL", "DEVELOPER"]
+  "ETL"       = ["INGEST_RW"]
+  "DEVELOPER" = ["INGEST_R", "CLEAN_RW", "CLEAN_R", "NORMALIZE_RW", "INTEGRATE_RW", "ANALYST"]
+  "ANALYST"   = ["ANALYZE_RW", "REGUSER"]
+  "REGUSER"   = ["NORMALIZE_R", "INTEGRATE_R", "ANALYZE_R"]
+}
+```
+
+The module will iterate through the configuration and determine which resources will be created. For example, by specifying multiple environments, the data stages and associated roles will be created for each environment. You can also leave the `environments` list empty to keep your environment simple (a single instance of each stage is created with no prefix).
+
+The users and roles created are inferred from the grant mapping by walking the configuration and ensuring all of the resources are created to successfully deploy the desired state.
+
 ## Requirements
 
 | Name | Version |
