@@ -1,0 +1,30 @@
+# Provider
+snowflake_account                = "ab12345.ca-central-1.aws"
+snowflake_username               = "Craig"
+snowflake_private_key_path       = "~/.local/share/snowflake/rsa_key.p8"
+snowflake_private_key_passphrase = "supersecretpassphrase"
+snowflake_role                   = "ACCOUNTADMIN"
+
+# Configuration
+environments = [
+  "DEV",
+  "PROD",
+]
+data_stages = [
+  "INGEST",
+  "CLEAN",
+  "NORMALIZE",
+  "INTEGRATE",
+  "ANALYZE",
+]
+user_grants = {
+  "DBT_CLOUD" = ["CICD"]
+}
+role_grants = {
+  "DBA"       = ["CICD"]
+  "CICD"      = ["ETL", "DEVELOPER"]
+  "ETL"       = ["INGEST_RW"]
+  "DEVELOPER" = ["INGEST_R", "CLEAN_RW", "CLEAN_R", "NORMALIZE_RW", "INTEGRATE_RW", "ANALYST"]
+  "ANALYST"   = ["ANALYZE_RW", "REGUSER"]
+  "REGUSER"   = ["NORMALIZE_R", "INTEGRATE_R", "ANALYZE_R"]
+}
