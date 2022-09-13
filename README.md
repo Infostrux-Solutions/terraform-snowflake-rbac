@@ -1,5 +1,5 @@
-# terraform-snowflake-X
-Quickly deploy Snowflake resources using a simple configuration model.
+# terraform-snowflake-rbac
+Quickly deploy Snowflake RBAC resources using a simple configuration model.
 
 ## Usage
 
