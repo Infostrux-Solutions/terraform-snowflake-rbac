@@ -97,6 +97,20 @@ locals {
     for pair in local.role_grants : "${pair.role}_${pair.grant}" => pair
   }
 
+  snowflake_role_grants = flatten([
+    for role, grants in var.role_grants : [
+      for grant in grants : {
+        role  = role
+        grant = grant
+      }
+      if contains(local.snowflake_managed_roles, role)
+    ]
+  ])
+
+  snowflake_role_grants_map = {
+    for pair in local.snowflake_role_grants : "${pair.role}_${pair.grant}" => pair
+  }
+
   users = keys(var.user_grants)
 
   user_grants = flatten([
