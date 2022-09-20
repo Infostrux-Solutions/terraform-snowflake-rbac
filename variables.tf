@@ -46,13 +46,3 @@ variable "role_grants" {
   type        = map(list(string))
   description = "A map of roles and which role they are granted to."
 }
-
-#variable "user_role_grants" {
-#  type        = map(string)
-#  description = "A map of user roles and which role they are granted to."
-#}
-#
-#variable "data_stage_role_grants" {
-#  type        = map(string)
-#  description = "A map of data stage roles and which role they are granted to."
-#}
