@@ -3,9 +3,9 @@ Quickly deploy Snowflake RBAC resources using a simple configuration model.
 
 ## TODO
 
-[ ] Add `CREATE SCHEMA` permission to database roles
-[ ] Add default warehouse for users
-[ ] Add ingest warehouse
+- [ ] Add `CREATE SCHEMA` permission to database roles
+- [ ] Add default warehouse for users
+- [ ] Add ingest warehouse
 
 ## Usage
 
