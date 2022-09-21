@@ -4,13 +4,23 @@ resource "snowflake_database" "databases" {
   name     = each.key
 }
 
-resource "snowflake_database_grant" "database_grants" {
+resource "snowflake_database_grant" "database_grants_r" {
   provider      = snowflake.securityadmin
   for_each      = toset(local.databases)
   database_name = snowflake_database.databases[each.key].name
   privilege     = "USAGE"
   roles = [
     snowflake_role.roles["${each.key}_R"].name,
+    snowflake_role.roles["${each.key}_RW"].name
+  ]
+}
+
+resource "snowflake_database_grant" "database_grants_rw" {
+  provider      = snowflake.securityadmin
+  for_each      = toset(local.databases)
+  database_name = snowflake_database.databases[each.key].name
+  privilege     = "CREATE SCHEMA"
+  roles = [
     snowflake_role.roles["${each.key}_RW"].name
   ]
 }
