@@ -1,6 +1,15 @@
 # terraform-snowflake-rbac
 Quickly deploy Snowflake RBAC resources using a simple configuration model.
 
+## TODO
+
+- [ ] Add `CREATE SCHEMA` permission to database roles
+- [ ] Add default warehouse for users
+- [ ] Add ingest warehouse
+- [ ] Allow different permissions per environment
+- [ ] Add a CI pipeline
+- [ ] Convert this to a proper module and update the README's usage section
+
 ## Usage
 
 ### Connecting to Snowflake
