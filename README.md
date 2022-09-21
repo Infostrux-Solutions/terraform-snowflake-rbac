@@ -8,6 +8,7 @@ Quickly deploy Snowflake RBAC resources using a simple configuration model.
 - [ ] Add ingest warehouse
 - [ ] Allow different permissions per environment
 - [ ] Add a CI pipeline
+- [ ] Convert this to a proper module and update the README's usage section
 
 ## Usage
 
