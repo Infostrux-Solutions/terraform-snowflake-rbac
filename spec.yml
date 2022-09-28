@@ -1,97 +1,136 @@
-# Databases
-
 databases:
-  analytics:
+  dev_ingest:
     privileges:
       read:
-        - reporter
+        - dev_ingest_r
       write:
-        - transformer
-  raw:
+        - dev_ingest_rw
+  dev_clean:
     privileges:
       read:
-        - reporter
+        - dev_clean_r
       write:
-        - transformer
-  testing_db:
+        - dev_clean_rw
+  dev_normalize:
     privileges:
       read:
-        - reporter
+        - dev_normalize_r
       write:
-        - transformer
+        - dev_normalize_rw
+  dev_integrate:
+    privileges:
+      read:
+        - dev_integrate_r
+      write:
+        - dev_integrate_rw
+  dev_analyze:
+    privileges:
+      read:
+        - dev_analyze_r
+      write:
+        - dev_analyze_rw
+  prod_ingest:
+    privileges:
+      read:
+        - prod_ingest_r
+      write:
+        - prod_ingest_rw
+  prod_clean:
+    privileges:
+      read:
+        - prod_clean_r
+      write:
+        - prod_clean_rw
+  prod_normalize:
+    privileges:
+      read:
+        - prod_normalize_r
+      write:
+        - prod_normalize_rw
+  prod_integrate:
+    privileges:
+      read:
+        - prod_integrate_r
+      write:
+        - prod_integrate_rw
+  prod_analyze:
+    privileges:
+      read:
+        - prod_analyze_r
+      write:
+        - prod_analyze_rw
 
-# Roles
+warehouses:
+  x-small:
+    privileges:
+      - automation
+      - ingest
+      - developer
+      - analyst
+      - reporting
+  small:
+    privileges:
+      - automation
+      - ingest
+  medium:
+    privileges:
+      - automation
+  large:
+    privileges:
+      - automation
 
 roles:
-  engineer:
-    member_of:
-      - sysadmin
-    warehouses:
-      - loading
-  loader:
-    warehouses:
-      - loading
-  reporter:
-    warehouses:
+  sysadmin:
+    granted_roles:
+      - dba
+  dba:
+    granted_roles:
+      - automation
+  automation:
+    granted_roles:
+      - ingest
+      - developer
+  ingest:
+    granted_roles:
+      - dev_ingest_rw
+      - prod_ingest_rw
+  developer:
+    granted_roles:
+      - analyst
+      - dev_clean_r
+      - dev_clean_rw
+      - dev_ingest_r
+      - dev_integrate_rw
+      - dev_normalize_rw
+      - prod_clean_r
+      - prod_clean_rw
+      - prod_ingest_r
+      - prod_integrate_rw
+      - prod_normalize_rw
+  analyst:
+    granted_roles:
       - reporting
-  transformer:
-    warehouses:
-      - transforming
-
-# Users
+      - dev_analyze_rw
+      - prod_analyze_rw
+  reporting:
+    granted_roles:
+      - dev_analyze_r
+      - dev_integrate_r
+      - dev_normalize_r
+      - prod_analyze_r
+      - prod_integrate_r
+      - prod_normalize_r
 
 users:
-  eburke:
-    can_login: yes
-    member_of:
-      - sysadmin
-      - transformer
-      - eburke
-
-  eeastwood:
-    can_login: yes
-    member_of:
-      - transformer
-      - eeastwood
-
-  gitlab-ci:
-    can_login: yes
-    member_of:
-      - loader
-      - reporter
-      - sysadmin
-      - transformer
-      - gitlab-ci
-
-  iroussos:
-    can_login: yes
-    member_of:
-      - engineer
-      - loader
-      - transformer
-      - sysadmin
-      - iroussos
-
-  jurbanc:
-    can_login: yes
-    member_of:
-      - securityadmin
-      - sysadmin
-      - jurbanc
-
-  target_snowflake:
-    can_login: yes
-    member_of:
-      - loader
-      - target_snowflake
-
-# Warehouses
-warehouses:
-  loading:
-    size: x-small
-
-  reporting:
-    size: x-small
-
-  transforming:
-    size: x-small
+  dbt_cloud:
+    granted_roles:
+      - automation
+  fivetran:
+    granted_roles:
+      - ingest
+  craig:
+    granted_roles:
+      - dba
+      - developer
+      - analyst
+      - reporting
