@@ -1,66 +1,61 @@
-resource "snowflake_database" "databases" {
-  provider = snowflake.sysadmin
-  for_each = toset(local.databases)
-  name     = each.key
-}
+# Database Privileges
 
-resource "snowflake_database_grant" "database_grants_r" {
+resource "snowflake_database_grant" "database_read_grants" {
   provider      = snowflake.securityadmin
-  for_each      = toset(local.databases)
-  database_name = snowflake_database.databases[each.key].name
-  privilege     = "USAGE"
-  roles = [
-    snowflake_role.roles["${each.key}_R"].name,
-    snowflake_role.roles["${each.key}_RW"].name
-  ]
-}
-
-resource "snowflake_database_grant" "database_grants_rw" {
-  provider      = snowflake.securityadmin
-  for_each      = toset(local.databases)
-  database_name = snowflake_database.databases[each.key].name
-  privilege     = "CREATE SCHEMA"
-  roles = [
-    snowflake_role.roles["${each.key}_RW"].name
-  ]
-}
-
-resource "snowflake_schema_grant" "schema_grants" {
-  provider      = snowflake.securityadmin
-  for_each      = toset(local.databases)
-  database_name = snowflake_database.databases[each.key].name
-  privilege     = "USAGE"
-  roles = [
-    snowflake_role.roles["${each.key}_R"].name,
-    snowflake_role.roles["${each.key}_RW"].name
-  ]
-  on_future         = true
-  with_grant_option = false
-}
-
-resource "snowflake_table_grant" "table_grants_r" {
-  provider = snowflake.securityadmin
-  for_each = {
-    for grant in local.database_grants_r : "${grant.database}.${grant.privilege}" => grant
-  }
-  database_name = snowflake_database.databases[each.value.database].name
+  for_each      = local.database_read_grants
+  database_name = each.value.database
   privilege     = each.value.privilege
-  roles = [
-    snowflake_role.roles["${each.value.database}_R"].name,
-    snowflake_role.roles["${each.value.database}_RW"].name,
-  ]
+  roles         = each.value.roles
+}
+
+resource "snowflake_database_grant" "database_write_grants" {
+  provider      = snowflake.securityadmin
+  for_each      = local.database_write_grants
+  database_name = each.value.database
+  privilege     = each.value.privilege
+  roles         = each.value.roles
+}
+
+# Schema Privileges
+
+resource "snowflake_schema_grant" "schema_read_grants" {
+  provider          = snowflake.securityadmin
+  for_each          = local.schema_read_grants
+  database_name     = each.value.database
+  privilege         = each.value.privilege
+  roles             = each.value.roles
   on_future         = true
   with_grant_option = false
 }
 
-resource "snowflake_table_grant" "table_grants_rw" {
-  provider = snowflake.securityadmin
-  for_each = {
-    for grant in local.database_grants_rw : "${grant.database}.${grant.privilege}" => grant
-  }
-  database_name     = snowflake_database.databases[each.value.database].name
+resource "snowflake_schema_grant" "schema_write_grants" {
+  provider          = snowflake.securityadmin
+  for_each          = local.schema_write_grants
+  database_name     = each.value.database
   privilege         = each.value.privilege
-  roles             = [snowflake_role.roles["${each.value.database}_RW"].name]
+  roles             = each.value.roles
+  on_future         = true
+  with_grant_option = false
+}
+
+# Table Privileges
+
+resource "snowflake_table_grant" "table_read_grants" {
+  provider          = snowflake.securityadmin
+  for_each          = local.table_read_grants
+  database_name     = each.value.database
+  privilege         = each.value.privilege
+  roles             = each.value.roles
+  on_future         = true
+  with_grant_option = false
+}
+
+resource "snowflake_table_grant" "table_write_grants" {
+  provider          = snowflake.securityadmin
+  for_each          = local.table_write_grants
+  database_name     = each.value.database
+  privilege         = each.value.privilege
+  roles             = each.value.roles
   on_future         = true
   with_grant_option = false
 }

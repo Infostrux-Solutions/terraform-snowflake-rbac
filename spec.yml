@@ -1,0 +1,97 @@
+# Databases
+
+databases:
+  analytics:
+    privileges:
+      read:
+        - reporter
+      write:
+        - transformer
+  raw:
+    privileges:
+      read:
+        - reporter
+      write:
+        - transformer
+  testing_db:
+    privileges:
+      read:
+        - reporter
+      write:
+        - transformer
+
+# Roles
+
+roles:
+  engineer:
+    member_of:
+      - sysadmin
+    warehouses:
+      - loading
+  loader:
+    warehouses:
+      - loading
+  reporter:
+    warehouses:
+      - reporting
+  transformer:
+    warehouses:
+      - transforming
+
+# Users
+
+users:
+  eburke:
+    can_login: yes
+    member_of:
+      - sysadmin
+      - transformer
+      - eburke
+
+  eeastwood:
+    can_login: yes
+    member_of:
+      - transformer
+      - eeastwood
+
+  gitlab-ci:
+    can_login: yes
+    member_of:
+      - loader
+      - reporter
+      - sysadmin
+      - transformer
+      - gitlab-ci
+
+  iroussos:
+    can_login: yes
+    member_of:
+      - engineer
+      - loader
+      - transformer
+      - sysadmin
+      - iroussos
+
+  jurbanc:
+    can_login: yes
+    member_of:
+      - securityadmin
+      - sysadmin
+      - jurbanc
+
+  target_snowflake:
+    can_login: yes
+    member_of:
+      - loader
+      - target_snowflake
+
+# Warehouses
+warehouses:
+  loading:
+    size: x-small
+
+  reporting:
+    size: x-small
+
+  transforming:
+    size: x-small
