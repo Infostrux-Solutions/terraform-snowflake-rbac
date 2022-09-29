@@ -53,76 +53,85 @@ locals {
     "MONITOR",
   ]
 
-  # Resource Lists
-
-  spec      = yamldecode(file("${path.module}/spec.yml"))
-  databases = keys(local.spec["databases"])
+  spec = yamldecode(file("${path.module}/spec.yml"))
 
   # Resource Maps
 
   ## Databases
 
   database_read_grants = { for combination in flatten([
-    for privilege in local.database_read_privileges : [
-      for database in local.databases : {
-        roles     = local.spec["databases"]["${database}"].privileges.read
-        privilege = privilege
-        database  = database
-      }
+    for environment in local.spec["environments"] : [
+      for stage in keys(local.spec["stages"]) : [
+        for privilege in local.database_read_privileges : {
+          role      = upper("${environment}_${stage}_R")
+          privilege = upper(privilege)
+          database  = upper("${environment}_${stage}")
+        }
+      ]
     ]
   ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
 
   database_write_grants = { for combination in flatten([
-    for privilege in local.database_write_privileges : [
-      for database in local.databases : {
-        roles     = local.spec["databases"]["${database}"].privileges.write
-        privilege = privilege
-        database  = database
-      }
+    for environment in local.spec["environments"] : [
+      for stage in keys(local.spec["stages"]) : [
+        for privilege in local.database_write_privileges : {
+          role      = upper("${environment}_${stage}_RW")
+          privilege = upper(privilege)
+          database  = upper("${environment}_${stage}")
+        }
+      ]
     ]
   ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
 
   ## Schemas
 
   schema_read_grants = { for combination in flatten([
-    for privilege in local.schema_read_privileges : [
-      for database in local.databases : {
-        roles     = local.spec["databases"]["${database}"].privileges.read
-        privilege = privilege
-        database  = database
-      }
+    for environment in local.spec["environments"] : [
+      for stage in keys(local.spec["stages"]) : [
+        for privilege in local.schema_read_privileges : {
+          role      = upper("${environment}_${stage}_R")
+          privilege = upper(privilege)
+          database  = upper("${environment}_${stage}")
+        }
+      ]
     ]
   ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
 
   schema_write_grants = { for combination in flatten([
-    for privilege in local.schema_write_privileges : [
-      for database in local.databases : {
-        roles     = local.spec["databases"]["${database}"].privileges.write
-        privilege = privilege
-        database  = database
-      }
+    for environment in local.spec["environments"] : [
+      for stage in keys(local.spec["stages"]) : [
+        for privilege in local.schema_write_privileges : {
+          role      = upper("${environment}_${stage}_RW")
+          privilege = upper(privilege)
+          database  = upper("${environment}_${stage}")
+        }
+      ]
     ]
   ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
 
   ## Tables
 
   table_read_grants = { for combination in flatten([
-    for privilege in local.table_read_privileges : [
-      for database in local.databases : {
-        roles     = local.spec["databases"]["${database}"].privileges.read
-        privilege = privilege
-        database  = database
-      }
+    for environment in local.spec["environments"] : [
+      for stage in keys(local.spec["stages"]) : [
+        for privilege in local.table_read_privileges : {
+          role      = upper("${environment}_${stage}_R")
+          privilege = upper(privilege)
+          database  = upper("${environment}_${stage}")
+        }
+      ]
     ]
   ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
 
   table_write_grants = { for combination in flatten([
-    for privilege in local.table_write_privileges : [
-      for database in local.databases : {
-        roles     = local.spec["databases"]["${database}"].privileges.write
-        privilege = privilege
-        database  = database
-      }
+    for environment in local.spec["environments"] : [
+      for stage in keys(local.spec["stages"]) : [
+        for privilege in local.table_write_privileges : {
+          role      = upper("${environment}_${stage}_RW")
+          privilege = upper(privilege)
+          database  = upper("${environment}_${stage}")
+        }
+      ]
     ]
   ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
 }

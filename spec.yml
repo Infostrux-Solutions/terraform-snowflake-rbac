@@ -2,7 +2,7 @@ environments:
   - dev
   - prod
 
-databases:
+stages:
   ingest:
     privileges:
       read:
