@@ -1,114 +1,82 @@
-environments:
-  - dev
-  - prod
-
-stages:
-  ingest:
-    privileges:
-      dev:
-        read:
-          - developer
-        write:
-          - ingest
-      prod:
-        write:
-          - ingest
-  clean:
-    privileges:
-      dev:
-        read:
-          - developer
-        write:
-          - developer
-      prod:
-        read:
-          - developer
-        write:
-          - developer
-  normalize:
-    privileges:
-      dev:
-        read:
-          - reporting
-        write:
-          - developer
-      prod:
-        read:
-          - reporting
-        write:
-          - developer
-  integrate:
-    privileges:
-      dev:
-        read:
-          - reporting
-        write:
-          - developer
-      prod:
-        read:
-          - reporting
-        write:
-          - developer
-  analyze:
-    privileges:
-      dev:
-        read:
-          - reporting
-        write:
-          - analyst
-      prod:
-        read:
-          - reporting
-        write:
-          - analyst
-
 roles:
   sysadmin:
-    granted_roles:
+    roles:
       - dba
   dba:
-    granted_roles:
+    roles:
       - automation
+    warehouses:
+      - x-small
+      - medium
+      - large
+    databases:
+      write:
+        - analyze
+        - clean
+        - ingest
+        - integrate
+        - normalize
   automation:
-    granted_roles:
+    roles:
       - ingest
       - developer
-  developer:
-    granted_roles:
+    warehouses:
+      - x-small
+      - medium
+      - large
+    databases:
+      write:
+        - analyze
+        - clean
+        - ingest
+        - integrate
+        - normalize
+  ingest:
+    roles:
       - analyst
+    warehouses:
+      - x-small
+      - medium
+      - large
+    databases:
+      write:
+        - ingest
+  developer:
+    roles:
+      - analyst
+    warehouses:
+      - x-small
+    databases:
+      read:
+        - ingest
+      write:
+        - analyze
+        - clean
+        - integrate
+        - normalize
   analyst:
-    granted_roles:
+    roles:
       - reporting
+    warehouses:
+      - x-small
+    databases:
+      read:
+        - ingest
+        - clean
+        - integrate
+        - normalize
+      write:
+        - analyze
 
 users:
   dbt_cloud:
-    granted_roles:
+    roles:
       - automation
   fivetran:
-    granted_roles:
+    roles:
       - ingest
   craig:
-    granted_roles:
+    roles:
       - dba
       - developer
       - analyst
-      - reporting
-
-warehouses:
-  x-small:
-    privileges:
-      - automation
-      - ingest
-      - developer
-      - analyst
-      - reporting
-  small:
-    privileges:
-      - automation
-      - ingest
-  medium:
-    privileges:
-      - automation
-  large:
-    privileges:
-      - automation
