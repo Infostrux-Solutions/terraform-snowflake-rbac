@@ -1,64 +1,70 @@
+environments:
+  - dev
+  - prod
+
 databases:
-  dev_ingest:
+  ingest:
     privileges:
       read:
-        - dev_ingest_r
+        - developer
       write:
-        - dev_ingest_rw
-  dev_clean:
+        - ingest
+  clean:
     privileges:
       read:
-        - dev_clean_r
+        - developer
       write:
-        - dev_clean_rw
-  dev_normalize:
+        - developer
+  normalize:
     privileges:
       read:
-        - dev_normalize_r
+        - reporting
       write:
-        - dev_normalize_rw
-  dev_integrate:
+        - developer
+  integrate:
     privileges:
       read:
-        - dev_integrate_r
+        - reporting
       write:
-        - dev_integrate_rw
-  dev_analyze:
+        - developer
+  analyze:
     privileges:
       read:
-        - dev_analyze_r
+        - reporting
       write:
-        - dev_analyze_rw
-  prod_ingest:
-    privileges:
-      read:
-        - prod_ingest_r
-      write:
-        - prod_ingest_rw
-  prod_clean:
-    privileges:
-      read:
-        - prod_clean_r
-      write:
-        - prod_clean_rw
-  prod_normalize:
-    privileges:
-      read:
-        - prod_normalize_r
-      write:
-        - prod_normalize_rw
-  prod_integrate:
-    privileges:
-      read:
-        - prod_integrate_r
-      write:
-        - prod_integrate_rw
-  prod_analyze:
-    privileges:
-      read:
-        - prod_analyze_r
-      write:
-        - prod_analyze_rw
+        - analyst
+
+roles:
+  sysadmin:
+    granted_roles:
+      - dba
+  dba:
+    granted_roles:
+      - automation
+  automation:
+    granted_roles:
+      - ingest
+      - developer
+  developer:
+    granted_roles:
+      - analyst
+  analyst:
+    granted_roles:
+      - reporting
+
+users:
+  dbt_cloud:
+    granted_roles:
+      - automation
+  fivetran:
+    granted_roles:
+      - ingest
+  craig:
+    granted_roles:
+      - dba
+      - developer
+      - analyst
+      - reporting
 
 warehouses:
   x-small:
@@ -78,59 +84,3 @@ warehouses:
   large:
     privileges:
       - automation
-
-roles:
-  sysadmin:
-    granted_roles:
-      - dba
-  dba:
-    granted_roles:
-      - automation
-  automation:
-    granted_roles:
-      - ingest
-      - developer
-  ingest:
-    granted_roles:
-      - dev_ingest_rw
-      - prod_ingest_rw
-  developer:
-    granted_roles:
-      - analyst
-      - dev_clean_r
-      - dev_clean_rw
-      - dev_ingest_r
-      - dev_integrate_rw
-      - dev_normalize_rw
-      - prod_clean_r
-      - prod_clean_rw
-      - prod_ingest_r
-      - prod_integrate_rw
-      - prod_normalize_rw
-  analyst:
-    granted_roles:
-      - reporting
-      - dev_analyze_rw
-      - prod_analyze_rw
-  reporting:
-    granted_roles:
-      - dev_analyze_r
-      - dev_integrate_r
-      - dev_normalize_r
-      - prod_analyze_r
-      - prod_integrate_r
-      - prod_normalize_r
-
-users:
-  dbt_cloud:
-    granted_roles:
-      - automation
-  fivetran:
-    granted_roles:
-      - ingest
-  craig:
-    granted_roles:
-      - dba
-      - developer
-      - analyst
-      - reporting
