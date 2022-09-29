@@ -5,34 +5,62 @@ environments:
 stages:
   ingest:
     privileges:
-      read:
-        - developer
-      write:
-        - ingest
+      dev:
+        read:
+          - developer
+        write:
+          - ingest
+      prod:
+        write:
+          - ingest
   clean:
     privileges:
-      read:
-        - developer
-      write:
-        - developer
+      dev:
+        read:
+          - developer
+        write:
+          - developer
+      prod:
+        read:
+          - developer
+        write:
+          - developer
   normalize:
     privileges:
-      read:
-        - reporting
-      write:
-        - developer
+      dev:
+        read:
+          - reporting
+        write:
+          - developer
+      prod:
+        read:
+          - reporting
+        write:
+          - developer
   integrate:
     privileges:
-      read:
-        - reporting
-      write:
-        - developer
+      dev:
+        read:
+          - reporting
+        write:
+          - developer
+      prod:
+        read:
+          - reporting
+        write:
+          - developer
   analyze:
     privileges:
-      read:
-        - reporting
-      write:
-        - analyst
+      dev:
+        read:
+          - reporting
+        write:
+          - analyst
+      prod:
+        read:
+          - reporting
+        write:
+          - analyst
 
 roles:
   sysadmin:
