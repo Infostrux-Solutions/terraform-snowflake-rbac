@@ -169,4 +169,38 @@ locals {
         }
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  ## Roles
+
+  roles_to_grant_to_roles = distinct(flatten([
+    for role, spec in local.spec["roles"] : spec.roles
+  ]))
+
+  role_grants = {
+    for grant in flatten([
+      for role_to_grant in local.roles_to_grant_to_roles : {
+        role_name = upper(role_to_grant)
+        roles = [
+          for role, spec in local.spec["roles"] : upper(role)
+          if contains(spec.roles, "${role_to_grant}")
+        ]
+      }
+  ]) : lower(replace("${grant.role_name}", " ", "_")) => grant }
+
+  ## Users
+
+  roles_to_grant_to_users = distinct(flatten([
+    for user, spec in local.spec["users"] : spec.roles
+  ]))
+
+  user_grants = {
+    for grant in flatten([
+      for role_to_grant in local.roles_to_grant_to_users : {
+        role_name = upper(role_to_grant)
+        users = [
+          for user, spec in local.spec["users"] : upper(user)
+          if contains(spec.roles, "${role_to_grant}")
+        ]
+      }
+  ]) : lower(replace("${grant.role_name}", " ", "_")) => grant }
 }
