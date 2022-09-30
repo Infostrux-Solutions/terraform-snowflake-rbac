@@ -1,5 +1,8 @@
 locals {
   # Constants
+
+  spec = yamldecode(file(var.spec_file_path))
+
   snowflake_default_roles = [
     "ACCOUNTADMIN",
     "SYSADMIN",
@@ -52,8 +55,6 @@ locals {
     "OPERATE",
     "MONITOR",
   ]
-
-  spec = yamldecode(file("${path.module}/spec.yml"))
 
   # Resource Maps
 
