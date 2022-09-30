@@ -59,79 +59,114 @@ locals {
 
   ## Databases
 
-  database_read_grants = { for combination in flatten([
-    for environment in local.spec["environments"] : [
-      for stage in keys(local.spec["stages"]) : [
-        for privilege in local.database_read_privileges : {
-          role      = upper("${environment}_${stage}_R")
-          privilege = upper(privilege)
-          database  = upper("${environment}_${stage}")
-        }
-      ]
-    ]
-  ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
+  roles_with_database_grants = {
+    for role, spec in local.spec["roles"] : role => spec
+    if contains(keys(spec), "databases")
+  }
 
-  database_write_grants = { for combination in flatten([
-    for environment in local.spec["environments"] : [
-      for stage in keys(local.spec["stages"]) : [
-        for privilege in local.database_write_privileges : {
-          role      = upper("${environment}_${stage}_RW")
-          privilege = upper(privilege)
-          database  = upper("${environment}_${stage}")
+  roles_with_database_read_grants = {
+    for role, spec in local.roles_with_database_grants : role => spec
+    if contains(keys(spec.databases), "read")
+  }
+
+  roles_with_database_write_grants = {
+    for role, spec in local.roles_with_database_grants : role => spec
+    if contains(keys(spec.databases), "write")
+  }
+
+  databases_with_read_grants = distinct(flatten([
+    for role, spec in local.roles_with_database_read_grants : spec.databases.read
+  ]))
+
+  databases_with_write_grants = distinct(flatten([
+    for role, spec in local.roles_with_database_write_grants : spec.databases.write
+  ]))
+
+  database_read_grants = {
+    for grant in flatten([
+      for privilege in local.database_read_privileges : [
+        for database in local.databases_with_read_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_read_grants : upper(role)
+            if contains(spec.databases.read, "${database}")
+          ]
         }
       ]
-    ]
-  ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  database_write_grants = {
+    for grant in flatten([
+      for privilege in local.database_write_privileges : [
+        for database in local.databases_with_write_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_write_grants : upper(role)
+            if contains(spec.databases.write, "${database}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
   ## Schemas
 
-  schema_read_grants = { for combination in flatten([
-    for environment in local.spec["environments"] : [
-      for stage in keys(local.spec["stages"]) : [
-        for privilege in local.schema_read_privileges : {
-          role      = upper("${environment}_${stage}_R")
-          privilege = upper(privilege)
-          database  = upper("${environment}_${stage}")
+  schema_read_grants = {
+    for grant in flatten([
+      for privilege in local.schema_read_privileges : [
+        for database in local.databases_with_read_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_read_grants : upper(role)
+            if contains(spec.databases.read, "${database}")
+          ]
         }
       ]
-    ]
-  ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
-  schema_write_grants = { for combination in flatten([
-    for environment in local.spec["environments"] : [
-      for stage in keys(local.spec["stages"]) : [
-        for privilege in local.schema_write_privileges : {
-          role      = upper("${environment}_${stage}_RW")
-          privilege = upper(privilege)
-          database  = upper("${environment}_${stage}")
+  schema_write_grants = {
+    for grant in flatten([
+      for privilege in local.schema_write_privileges : [
+        for database in local.databases_with_write_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_write_grants : upper(role)
+            if contains(spec.databases.write, "${database}")
+          ]
         }
       ]
-    ]
-  ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
   ## Tables
 
-  table_read_grants = { for combination in flatten([
-    for environment in local.spec["environments"] : [
-      for stage in keys(local.spec["stages"]) : [
-        for privilege in local.table_read_privileges : {
-          role      = upper("${environment}_${stage}_R")
-          privilege = upper(privilege)
-          database  = upper("${environment}_${stage}")
+  table_read_grants = {
+    for grant in flatten([
+      for privilege in local.table_read_privileges : [
+        for database in local.databases_with_read_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_read_grants : upper(role)
+            if contains(spec.databases.read, "${database}")
+          ]
         }
       ]
-    ]
-  ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
-  table_write_grants = { for combination in flatten([
-    for environment in local.spec["environments"] : [
-      for stage in keys(local.spec["stages"]) : [
-        for privilege in local.table_write_privileges : {
-          role      = upper("${environment}_${stage}_RW")
-          privilege = upper(privilege)
-          database  = upper("${environment}_${stage}")
+  table_write_grants = {
+    for grant in flatten([
+      for privilege in local.table_write_privileges : [
+        for database in local.databases_with_write_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_write_grants : upper(role)
+            if contains(spec.databases.write, "${database}")
+          ]
         }
       ]
-    ]
-  ]) : lower(replace("${combination.privilege}_${combination.database}", " ", "_")) => combination }
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 }
