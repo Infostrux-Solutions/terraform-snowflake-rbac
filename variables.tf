@@ -25,24 +25,3 @@ variable "snowflake_role" {
   type        = string
   description = "The Snowflake role used to deploy into the Snowflake account."
 }
-
-# Configuration
-variable "environments" {
-  type        = list(string)
-  description = "The list of environments to create in the Snowflake account."
-}
-
-variable "data_stages" {
-  type        = list(string)
-  description = "The list of data stages to create in the Snowflake account."
-}
-
-variable "user_grants" {
-  type        = map(list(string))
-  description = "A map of users and which role they are granted to."
-}
-
-variable "role_grants" {
-  type        = map(list(string))
-  description = "A map of roles and which role they are granted to."
-}

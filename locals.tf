@@ -1,130 +1,236 @@
 locals {
-  snowflake_managed_roles = [
+  # Constants
+  snowflake_default_roles = [
     "ACCOUNTADMIN",
     "SYSADMIN",
     "SECURITYADMIN",
     "USERADMIN",
-    "ORGADMIN",
     "PUBLIC",
   ]
 
-  privileges_r = [
+  database_read_privileges = [
+    "USAGE",
+  ]
+
+  database_write_privileges = [
+    "USAGE",
+    "MONITOR",
+    "CREATE SCHEMA",
+  ]
+
+  schema_read_privileges = [
+    "USAGE",
+  ]
+
+  schema_write_privileges = [
+    "USAGE",
+    "MONITOR",
+    "CREATE TABLE",
+    "CREATE VIEW",
+    "CREATE STAGE",
+    "CREATE FILE FORMAT",
+    "CREATE SEQUENCE",
+    "CREATE FUNCTION",
+    "CREATE PIPE",
+  ]
+
+  table_read_privileges = [
     "SELECT",
   ]
 
-  privileges_rw = [
+  table_write_privileges = [
+    "SELECT",
     "INSERT",
     "UPDATE",
     "DELETE",
+    "TRUNCATE",
+    "REFERENCES",
   ]
 
-  databases = (length(var.environments) == 0
-    ?
-    [for stage in var.data_stages : stage]
-    :
-    flatten([
-      for environment in var.environments : [
-        for stage in var.data_stages : [
-          "${environment}_${stage}"
-        ]
-      ]
-    ])
-  )
-
-  database_grants_r = [
-    for pair in setproduct(local.databases, local.privileges_r) : {
-      database  = pair[0]
-      privilege = pair[1]
-    }
+  warehouse_privileges = [
+    "USAGE",
+    "OPERATE",
+    "MONITOR",
   ]
 
-  database_grants_rw = [
-    for pair in setproduct(local.databases, local.privileges_rw) : {
-      database  = pair[0]
-      privilege = pair[1]
-    }
-  ]
+  spec = yamldecode(file("${path.module}/spec.yml"))
 
-  roles = concat(
-    [for role in keys(var.role_grants) : role if !contains(local.snowflake_managed_roles, role)],
-    [for database in local.databases : "${database}_R"],
-    [for database in local.databases : "${database}_RW"],
-  )
+  # Resource Maps
 
-  user_role_grants = flatten([
-    for role, grants in var.role_grants : [
-      for grant in grants : {
-        role  = role
-        grant = grant
-      }
-      if !contains(formatlist("%s_R", var.data_stages), grant)
-      && !contains(formatlist("%s_RW", var.data_stages), grant)
-      && !contains(local.snowflake_managed_roles, role)
-      && !contains(local.snowflake_managed_roles, grant)
-    ]
-  ])
+  ## Databases
 
-  data_stage_role_grants = (length(var.environments) != 0
-    ?
-    flatten([
-      for environment in var.environments : [
-        for role, grants in var.role_grants : [
-          for grant in grants : {
-            role  = role
-            grant = "${environment}_${grant}"
-          }
-          if contains(formatlist("%s_R", var.data_stages), grant)
-          || contains(formatlist("%s_RW", var.data_stages), grant)
-        ]
-      ]
-    ])
-    :
-    flatten([
-      for role, grants in var.role_grants : [
-        for grant in grants : {
-          role  = role
-          grant = grant
+  roles_with_database_grants = {
+    for role, spec in local.spec["roles"] : role => spec
+    if contains(keys(spec), "databases")
+  }
+
+  roles_with_database_read_grants = {
+    for role, spec in local.roles_with_database_grants : role => spec
+    if contains(keys(spec.databases), "read")
+  }
+
+  roles_with_database_write_grants = {
+    for role, spec in local.roles_with_database_grants : role => spec
+    if contains(keys(spec.databases), "write")
+  }
+
+  databases_with_read_grants = distinct(flatten([
+    for role, spec in local.roles_with_database_read_grants : spec.databases.read
+  ]))
+
+  databases_with_write_grants = distinct(flatten([
+    for role, spec in local.roles_with_database_write_grants : spec.databases.write
+  ]))
+
+  database_read_grants = {
+    for grant in flatten([
+      for privilege in local.database_read_privileges : [
+        for database in local.databases_with_read_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_read_grants : upper(role)
+            if contains(spec.databases.read, "${database}")
+          ]
         }
-        if contains(formatlist("%s_R", var.data_stages), grant)
-        || contains(formatlist("%s_RW", var.data_stages), grant)
       ]
-    ])
-  )
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
-  role_grants = concat(local.user_role_grants, local.data_stage_role_grants)
+  database_write_grants = {
+    for grant in flatten([
+      for privilege in local.database_write_privileges : [
+        for database in local.databases_with_write_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_write_grants : upper(role)
+            if contains(spec.databases.write, "${database}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
-  role_grants_map = {
-    for pair in local.role_grants : "${pair.role}_${pair.grant}" => pair
+  ### Schemas
+
+  schema_read_grants = {
+    for grant in flatten([
+      for privilege in local.schema_read_privileges : [
+        for database in local.databases_with_read_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_read_grants : upper(role)
+            if contains(spec.databases.read, "${database}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  schema_write_grants = {
+    for grant in flatten([
+      for privilege in local.schema_write_privileges : [
+        for database in local.databases_with_write_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_write_grants : upper(role)
+            if contains(spec.databases.write, "${database}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  ### Tables
+
+  table_read_grants = {
+    for grant in flatten([
+      for privilege in local.table_read_privileges : [
+        for database in local.databases_with_read_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_read_grants : upper(role)
+            if contains(spec.databases.read, "${database}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  table_write_grants = {
+    for grant in flatten([
+      for privilege in local.table_write_privileges : [
+        for database in local.databases_with_write_grants : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_database_write_grants : upper(role)
+            if contains(spec.databases.write, "${database}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  ## Roles
+
+  roles_with_role_grants = {
+    for role, spec in local.spec["roles"] : role => spec
+    if contains(keys(spec), "roles")
   }
 
-  snowflake_role_grants = flatten([
-    for role, grants in var.role_grants : [
-      for grant in grants : {
-        role  = role
-        grant = grant
+  roles_to_grant_to_roles = distinct(flatten([
+    for role, spec in local.roles_with_role_grants : spec.roles
+  ]))
+
+  role_grants = {
+    for grant in flatten([
+      for role_to_grant in local.roles_to_grant_to_roles : {
+        role_name = upper(role_to_grant)
+        roles = [
+          for role, spec in local.roles_with_role_grants : upper(role)
+          if contains(spec.roles, "${role_to_grant}")
+        ]
       }
-      if contains(local.snowflake_managed_roles, role)
-    ]
-  ])
+  ]) : lower(replace("${grant.role_name}", " ", "_")) => grant }
 
-  snowflake_role_grants_map = {
-    for pair in local.snowflake_role_grants : "${pair.role}_${pair.grant}" => pair
-  }
+  ## Users
 
-  users = keys(var.user_grants)
+  roles_to_grant_to_users = distinct(flatten([
+    for user, spec in local.spec["users"] : spec.roles
+  ]))
 
-  user_grants = flatten([
-    for user, grants in var.user_grants : [
-      for grant in grants : {
-        user  = user
-        grant = grant
+  user_grants = {
+    for grant in flatten([
+      for role_to_grant in local.roles_to_grant_to_users : {
+        role_name = upper(role_to_grant)
+        users = [
+          for user, spec in local.spec["users"] : upper(user)
+          if contains(spec.roles, "${role_to_grant}")
+        ]
       }
-      if !contains(local.snowflake_managed_roles, user)
-      && !contains(local.snowflake_managed_roles, grant)
-    ]
-  ])
+  ]) : lower(replace("${grant.role_name}", " ", "_")) => grant }
 
-  user_grants_map = {
-    for pair in local.user_grants : "${pair.user}_${pair.grant}" => pair
+  ## Warehouses
+
+  roles_with_warehouse_grants = {
+    for role, spec in local.spec["roles"] : role => spec
+    if contains(keys(spec), "warehouses")
   }
+
+  warehouses_to_grant_to_roles = distinct(flatten([
+    for role, spec in local.roles_with_warehouse_grants : spec.warehouses
+  ]))
+
+  warehouse_grants = {
+    for grant in flatten([
+      for privilege in local.warehouse_privileges : [
+        for warehouse in local.warehouses_to_grant_to_roles : {
+          warehouse_name = upper(warehouse)
+          privilege      = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_warehouse_grants : upper(role)
+            if contains(spec.warehouses, "${warehouse}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.warehouse_name}_${grant.privilege}", " ", "_")) => grant }
 }
