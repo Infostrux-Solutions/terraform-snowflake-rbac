@@ -1,14 +1,15 @@
 # terraform-snowflake-rbac
 Quickly deploy Snowflake RBAC resources using a simple configuration model.
 
+This module assumes the resources specified have been created in Snowflake by other means (e.g. through the Snowflake UI, using DDL commands or another Terraform project). In other words, no resources are created using this module, rather they are associated using their respective `snowflake_*_grant` Terraform resource blocks.
+
 ## TODO
 
 - [x] Add `CREATE SCHEMA` permission to database roles
-- [ ] Add all relevant read/write permissions to database grants
-- [ ] Add all relevant read/write permissions to schema grants
-- [ ] Add default warehouse for users
-- [ ] Add ingest warehouse
-- [ ] Allow different permissions per environment
+- [x] Add all relevant read/write permissions to database grants
+- [x] Add all relevant read/write permissions to schema grants
+- [x] Add ingest warehouse
+- [x] Allow different permissions per environment
 - [ ] Add a CI pipeline
 - [ ] Convert this to a proper module and update the README's usage section
 
@@ -30,36 +31,72 @@ The Snowflake Terraform provider uses private key authentication so this must be
 
 ### Configuring Resources
 
-Copy the `terraform.tfvars.example` file to `terraform.tfvars` and populate it with your desired Snowflake environment. For example,
+The YAML specification file is used to define the databases, roles, users and warehouses in a Snowflake account together with their relative permissions.
 
-```hcl
-environments = [
-  "DEV",
-  "PROD",
-]
-data_stages = [
-  "INGEST",
-  "CLEAN",
-  "NORMALIZE",
-  "INTEGRATE",
-  "ANALYZE",
-]
-user_grants = {
-  "DBT_CLOUD" = ["CICD"]
-}
-role_grants = {
-  "DBA"       = ["CICD"]
-  "CICD"      = ["ETL", "DEVELOPER"]
-  "ETL"       = ["INGEST_RW"]
-  "DEVELOPER" = ["INGEST_R", "CLEAN_RW", "CLEAN_R", "NORMALIZE_RW", "INTEGRATE_RW", "ANALYST"]
-  "ANALYST"   = ["ANALYZE_RW", "REGUSER"]
-  "REGUSER"   = ["NORMALIZE_R", "INTEGRATE_R", "ANALYZE_R"]
-}
+Users and Roles are associated with each other by specifying a list of `roles` in their respective specification (see below). This is equivalent to adding roles to the "Granted Roles" section in the Snowflake UI.
+
+Database permissions are abbreviated as `read` or `write` permissions, with this module generating the proper grants. The following table shows the association between this module's permissions and Snowflake grants.
+
+|  Objects   | Permissions | Snowflake Grants                             |
+|------------|-------------|----------------------------------------------|
+| Databases  | read        | USAGE                                        |
+|            | write       | MONITOR, CREATE SCHEMA                       |
+| Schemas    | read        | USAGE                                        |
+|            | write       | MONITOR, CREATE TABLE, CREATE VIEW, CREATE STAGE, CREATE FILE FORMAT, CREATE SEQUENCE, CREATE FUNCTION, CREATE PIPE                                 |
+| Tables     | read        | SELECT                                       |
+|            | write       | INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES |
+| Warehouses |             | USAGE, OPERATE, MONITOR                      |
+
+For `schemas` and `tables`, if no permission is specified, then the permissions specified for the database are assumed. The `warehouse` objects have a single permission type so they are specified without a `read` or `write` qualifier (see below).
+
+#### spec.yml
+
+A specification file has the following structure:
+
+```yaml
+# Roles
+roles:
+  role_name:
+    roles:
+      - role_name
+  role_name:
+    roles:
+      - role_name
+      - ...
+    warehouses:
+      - warehouse_name
+      - ...
+    databases:
+      read:
+        - database_name
+        - ...
+      write:
+        - database_name
+        - ...
+    schemas:
+      read:
+        - schema_name
+        - ...
+      write:
+        - schema_name
+        - ...
+    tables:
+      read:
+        - table_name
+        - ...
+      write:
+        - table_name
+        - ...
+  ... ... ...
+
+# Users
+users:
+  user_name:
+    roles:
+      - role_name
+      - ...
+  ... ... ...
 ```
-
-The module will iterate through the configuration and determine which resources will be created. For example, by specifying multiple environments, the data stages and associated roles will be created for each environment. You can also leave the `environments` list empty to keep your environment simple (a single instance of each stage is created with no prefix).
-
-The users and roles created are inferred from the grant mapping by walking the configuration and ensuring all of the resources are created to successfully deploy the desired state.
 
 ## Requirements
 
