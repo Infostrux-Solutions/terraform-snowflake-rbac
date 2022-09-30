@@ -1,0 +1,82 @@
+roles:
+  sysadmin:
+    roles:
+      - dba
+  dba:
+    roles:
+      - automation
+    warehouses:
+      - x-small
+      - medium
+      - large
+    databases:
+      write:
+        - analyze
+        - clean
+        - ingest
+        - integrate
+        - normalize
+  automation:
+    roles:
+      - ingest
+      - developer
+    warehouses:
+      - x-small
+      - medium
+      - large
+    databases:
+      write:
+        - analyze
+        - clean
+        - ingest
+        - integrate
+        - normalize
+  ingest:
+    roles:
+      - analyst
+    warehouses:
+      - x-small
+      - medium
+      - large
+    databases:
+      write:
+        - ingest
+  developer:
+    roles:
+      - analyst
+    warehouses:
+      - x-small
+    databases:
+      read:
+        - ingest
+      write:
+        - analyze
+        - clean
+        - integrate
+        - normalize
+  analyst:
+    roles:
+      - reporting
+    warehouses:
+      - x-small
+    databases:
+      read:
+        - ingest
+        - clean
+        - integrate
+        - normalize
+      write:
+        - analyze
+
+users:
+  dbt_cloud:
+    roles:
+      - automation
+  fivetran:
+    roles:
+      - ingest
+  craig:
+    roles:
+      - dba
+      - developer
+      - analyst
