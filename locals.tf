@@ -110,7 +110,7 @@ locals {
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
-  ## Schemas
+  ### Schemas
 
   schema_read_grants = {
     for grant in flatten([
@@ -140,7 +140,7 @@ locals {
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
-  ## Tables
+  ### Tables
 
   table_read_grants = {
     for grant in flatten([
@@ -172,8 +172,13 @@ locals {
 
   ## Roles
 
+  roles_with_role_grants = {
+    for role, spec in local.spec["roles"] : role => spec
+    if contains(keys(spec), "roles")
+  }
+
   roles_to_grant_to_roles = distinct(flatten([
-    for role, spec in local.spec["roles"] : spec.roles
+    for role, spec in local.roles_with_role_grants : spec.roles
   ]))
 
   role_grants = {
@@ -181,7 +186,7 @@ locals {
       for role_to_grant in local.roles_to_grant_to_roles : {
         role_name = upper(role_to_grant)
         roles = [
-          for role, spec in local.spec["roles"] : upper(role)
+          for role, spec in local.roles_with_role_grants : upper(role)
           if contains(spec.roles, "${role_to_grant}")
         ]
       }
@@ -203,4 +208,29 @@ locals {
         ]
       }
   ]) : lower(replace("${grant.role_name}", " ", "_")) => grant }
+
+  ## Warehouses
+
+  roles_with_warehouse_grants = {
+    for role, spec in local.spec["roles"] : role => spec
+    if contains(keys(spec), "warehouses")
+  }
+
+  warehouses_to_grant_to_roles = distinct(flatten([
+    for role, spec in local.roles_with_warehouse_grants : spec.warehouses
+  ]))
+
+  warehouse_grants = {
+    for grant in flatten([
+      for privilege in local.warehouse_privileges : [
+        for warehouse in local.warehouses_to_grant_to_roles : {
+          warehouse_name = upper(warehouse)
+          privilege      = upper(privilege)
+          roles = [
+            for role, spec in local.roles_with_warehouse_grants : upper(role)
+            if contains(spec.warehouses, "${warehouse}")
+          ]
+        }
+      ]
+  ]) : lower(replace("${grant.warehouse_name}_${grant.privilege}", " ", "_")) => grant }
 }
