@@ -5,7 +5,7 @@ resource "snowflake_database_grant" "database_read_grants" {
   database_name          = each.value.database_name
   privilege              = each.value.privilege
   roles                  = each.value.roles
-  enable_multiple_grants =  true
+  enable_multiple_grants = true
 }
 
 resource "snowflake_database_grant" "database_write_grants" {
