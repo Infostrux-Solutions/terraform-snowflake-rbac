@@ -3,14 +3,6 @@ locals {
 
   spec = yamldecode(file(var.spec_file_path))
 
-  snowflake_default_roles = [
-    "ACCOUNTADMIN",
-    "SYSADMIN",
-    "SECURITYADMIN",
-    "USERADMIN",
-    "PUBLIC",
-  ]
-
   database_read_privileges = [
     "USAGE",
   ]
@@ -60,39 +52,33 @@ locals {
 
   ## Databases
 
-  roles_with_database_grants = {
-    for role, spec in local.spec["roles"] : role => spec
-    if contains(keys(spec), "databases")
+  databases_with_privileges = {
+    for database, spec in local.spec["databases"] : database => spec
+    if contains(keys(spec), "privileges")
   }
 
-  roles_with_database_read_grants = {
-    for role, spec in local.roles_with_database_grants : role => spec
-    if contains(keys(spec.databases), "read")
+  databases_with_database_privileges = {
+    for database, spec in local.databases_with_privileges : database => spec
+    if contains(keys(spec.privileges), "database")
   }
 
-  roles_with_database_write_grants = {
-    for role, spec in local.roles_with_database_grants : role => spec
-    if contains(keys(spec.databases), "write")
+  databases_with_database_read_privileges = {
+    for database, spec in local.databases_with_database_privileges : database => spec
+    if contains(keys(spec.privileges.database), "read")
   }
 
-  databases_with_read_grants = distinct(flatten([
-    for role, spec in local.roles_with_database_read_grants : spec.databases.read
-  ]))
-
-  databases_with_write_grants = distinct(flatten([
-    for role, spec in local.roles_with_database_write_grants : spec.databases.write
-  ]))
+  databases_with_database_write_privileges = {
+    for database, spec in local.databases_with_database_privileges : database => spec
+    if contains(keys(spec.privileges.database), "write")
+  }
 
   database_read_grants = {
     for grant in flatten([
       for privilege in local.database_read_privileges : [
-        for database in local.databases_with_read_grants : {
+        for database, spec in local.databases_with_database_read_privileges : {
           database_name = upper(database)
           privilege     = upper(privilege)
-          roles = [
-            for role, spec in local.roles_with_database_read_grants : upper(role)
-            if contains(spec.databases.read, "${database}")
-          ]
+          roles         = [for role in spec.privileges.database.read.roles : upper(role)]
         }
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
@@ -100,29 +86,38 @@ locals {
   database_write_grants = {
     for grant in flatten([
       for privilege in local.database_write_privileges : [
-        for database in local.databases_with_write_grants : {
+        for database, spec in local.databases_with_database_write_privileges : {
           database_name = upper(database)
           privilege     = upper(privilege)
-          roles = [
-            for role, spec in local.roles_with_database_write_grants : upper(role)
-            if contains(spec.databases.write, "${database}")
-          ]
+          roles         = [for role in spec.privileges.database.write.roles : upper(role)]
         }
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
-  ### Schemas
+  ## Schemas
+
+  databases_with_schema_privileges = {
+    for database, spec in local.databases_with_privileges : database => spec
+    if contains(keys(spec.privileges), "schemas")
+  }
+
+  databases_with_schema_read_privileges = {
+    for database, spec in local.databases_with_schema_privileges : database => spec
+    if contains(keys(spec.privileges.schema), "read")
+  }
+
+  databases_with_schema_write_privileges = {
+    for database, spec in local.databases_with_schema_privileges : database => spec
+    if contains(keys(spec.privileges.schema), "write")
+  }
 
   schema_read_grants = {
     for grant in flatten([
       for privilege in local.schema_read_privileges : [
-        for database in local.databases_with_read_grants : {
+        for database, spec in local.databases_with_database_read_privileges : {
           database_name = upper(database)
           privilege     = upper(privilege)
-          roles = [
-            for role, spec in local.roles_with_database_read_grants : upper(role)
-            if contains(spec.databases.read, "${database}")
-          ]
+          roles         = [for role in spec.privileges.database.read.roles : upper(role)]
         }
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
@@ -130,29 +125,38 @@ locals {
   schema_write_grants = {
     for grant in flatten([
       for privilege in local.schema_write_privileges : [
-        for database in local.databases_with_write_grants : {
+        for database, spec in local.databases_with_database_write_privileges : {
           database_name = upper(database)
           privilege     = upper(privilege)
-          roles = [
-            for role, spec in local.roles_with_database_write_grants : upper(role)
-            if contains(spec.databases.write, "${database}")
-          ]
+          roles         = [for role in spec.privileges.database.write.roles : upper(role)]
         }
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
   ### Tables
 
+  databases_with_table_privileges = {
+    for database, spec in local.databases_with_privileges : database => spec
+    if contains(keys(spec.privileges), "tables")
+  }
+
+  databases_with_table_read_privileges = {
+    for database, spec in local.databases_with_table_privileges : database => spec
+    if contains(keys(spec.privileges.table), "read")
+  }
+
+  databases_with_table_write_privileges = {
+    for database, spec in local.databases_with_table_privileges : database => spec
+    if contains(keys(spec.privileges.table), "write")
+  }
+
   table_read_grants = {
     for grant in flatten([
       for privilege in local.table_read_privileges : [
-        for database in local.databases_with_read_grants : {
+        for database, spec in local.databases_with_database_read_privileges : {
           database_name = upper(database)
           privilege     = upper(privilege)
-          roles = [
-            for role, spec in local.roles_with_database_read_grants : upper(role)
-            if contains(spec.databases.read, "${database}")
-          ]
+          roles         = [for role in spec.privileges.database.read.roles : upper(role)]
         }
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
@@ -160,77 +164,62 @@ locals {
   table_write_grants = {
     for grant in flatten([
       for privilege in local.table_write_privileges : [
-        for database in local.databases_with_write_grants : {
+        for database, spec in local.databases_with_database_write_privileges : {
           database_name = upper(database)
           privilege     = upper(privilege)
-          roles = [
-            for role, spec in local.roles_with_database_write_grants : upper(role)
-            if contains(spec.databases.write, "${database}")
-          ]
+          roles         = [for role in spec.privileges.database.write.roles : upper(role)]
         }
       ]
   ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
 
+
   ## Roles
 
-  roles_with_role_grants = {
+  roles_with_grants = {
     for role, spec in local.spec["roles"] : role => spec
-    if contains(keys(spec), "roles")
+    if contains(keys(spec), "grant_to")
   }
 
-  roles_to_grant_to_roles = distinct(flatten([
-    for role, spec in local.roles_with_role_grants : spec.roles
-  ]))
+  roles_with_role_grants = {
+    for role, spec in local.roles_with_grants : role => spec
+    if contains(keys(spec.grant_to), "roles")
+  }
+
+  roles_with_user_grants = {
+    for role, spec in local.roles_with_grants : role => spec
+    if contains(keys(spec.grant_to), "users")
+  }
 
   role_grants = {
     for grant in flatten([
-      for role_to_grant in local.roles_to_grant_to_roles : {
-        role_name = upper(role_to_grant)
-        roles = [
-          for role, spec in local.roles_with_role_grants : upper(role)
-          if contains(spec.roles, "${role_to_grant}")
-        ]
+      for role, spec in local.roles_with_role_grants : {
+        role_name = upper(role)
+        roles     = [for grant_to_role in spec.grant_to.roles : upper(grant_to_role)]
       }
   ]) : lower(replace("${grant.role_name}", " ", "_")) => grant }
 
-  ## Users
-
-  roles_to_grant_to_users = distinct(flatten([
-    for user, spec in local.spec["users"] : spec.roles
-  ]))
-
   user_grants = {
     for grant in flatten([
-      for role_to_grant in local.roles_to_grant_to_users : {
-        role_name = upper(role_to_grant)
-        users = [
-          for user, spec in local.spec["users"] : upper(user)
-          if contains(spec.roles, "${role_to_grant}")
-        ]
+      for role, spec in local.roles_with_user_grants : {
+        role_name = upper(role)
+        users     = [for grant_to_user in spec.grant_to.users : upper(grant_to_user)]
       }
   ]) : lower(replace("${grant.role_name}", " ", "_")) => grant }
 
   ## Warehouses
 
-  roles_with_warehouse_grants = {
-    for role, spec in local.spec["roles"] : role => spec
-    if contains(keys(spec), "warehouses")
+  warehouses_with_privileges = {
+    for warehouse, spec in local.spec["warehouses"] : warehouse => spec
+    if contains(keys(spec), "privileges")
   }
-
-  warehouses_to_grant_to_roles = distinct(flatten([
-    for role, spec in local.roles_with_warehouse_grants : spec.warehouses
-  ]))
 
   warehouse_grants = {
     for grant in flatten([
       for privilege in local.warehouse_privileges : [
-        for warehouse in local.warehouses_to_grant_to_roles : {
+        for warehouse, spec in local.warehouses_with_privileges : {
           warehouse_name = upper(warehouse)
           privilege      = upper(privilege)
-          roles = [
-            for role, spec in local.roles_with_warehouse_grants : upper(role)
-            if contains(spec.warehouses, "${warehouse}")
-          ]
+          roles          = [for role in spec.privileges.roles : upper(role)]
         }
       ]
   ]) : lower(replace("${grant.warehouse_name}_${grant.privilege}", " ", "_")) => grant }
