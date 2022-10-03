@@ -17,7 +17,7 @@ module "rbac" {
   source = "Infostrux-Solutions/terraform-snowflake-rbac"
 
   providers = {
-    snowflake.securityadmin = snowflake.securityadmin
+    snowflake = snowflake.securityadmin
   }
 
   depends_on = [
@@ -153,7 +153,7 @@ warehouses:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_snowflake.securityadmin"></a> [snowflake.securityadmin](#provider\_snowflake.securityadmin) | 0.46.0 |
+| <a name="provider_snowflake"></a> [snowflake](#provider\_snowflake) | >= 0.46.0 |
 
 ## Modules
 
