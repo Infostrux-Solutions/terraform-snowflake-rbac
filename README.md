@@ -33,9 +33,9 @@ module "rbac" {
 
 ### Snowflake Role
 
-Snowflake recommends using the SECURITYADMIN system role to grant or revoke privileges on objects in the account. This module requires that a provider alias is setup such that Terraform uses SECURITYADMIN to apply the resource grants.
+Snowflake recommends using the **SECURITYADMIN** system role to grant or revoke privileges on objects in the account. Though not required, this module should be configured with a provider alias that uses **SECURITYADMIN** to apply the resource grants.
 
-The following is an example of a working `providers.tf` file which specifies a user configurable role (default) and the SECURITYADMIN aliased role:
+The following is an example of a working `providers.tf` file which specifies a user configurable role (default) and the **SECURITYADMIN** aliased role:
 
 ```hcl
 terraform {
