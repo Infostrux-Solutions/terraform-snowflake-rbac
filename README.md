@@ -14,7 +14,8 @@ This module assumes the resources specified have been created in Snowflake by ot
 
 ```hcl
 module "rbac" {
-  source = "Infostrux-Solutions/terraform-snowflake-rbac"
+  source  = "Infostrux-Solutions/terraform-snowflake-rbac"
+  version = "~> 0.5.0"
 
   providers = {
     snowflake = snowflake.securityadmin
