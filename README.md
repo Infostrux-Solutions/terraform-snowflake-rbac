@@ -6,9 +6,10 @@ This module assumes the resources specified have been created in Snowflake by ot
 
 ## TODO
 
+- [x] Add a CI pipeline
+- [ ] Add a release pipeline
 - [ ] Update schema privileges to use spec.yml
 - [ ] Update table privileges to use spec.yml
-- [ ] Add a CI pipeline
 
 ## Usage
 
