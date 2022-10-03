@@ -153,9 +153,7 @@ warehouses:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_snowflake.useradmin"></a> [snowflake.useradmin](#provider\_snowflake.useradmin) | 0.46.0 |
 | <a name="provider_snowflake.securityadmin"></a> [snowflake.securityadmin](#provider\_snowflake.securityadmin) | 0.46.0 |
-| <a name="provider_snowflake.sysadmin"></a> [snowflake.sysadmin](#provider\_snowflake.sysadmin) | 0.46.0 |
 
 ## Modules
 
