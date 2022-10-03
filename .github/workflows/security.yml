@@ -1,4 +1,4 @@
-name: Security
+name: Security Checks
 
 on:
   pull_request
