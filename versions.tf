@@ -3,9 +3,9 @@ terraform {
 
   required_providers {
     snowflake = {
-      source  = "Snowflake-Labs/snowflake"
-      version = ">= 0.46.0"
-      configuration_aliases = [ snowflake.useradmin, snowflake.securityadmin, snowflake.sysadmin ]
+      source                = "Snowflake-Labs/snowflake"
+      version               = ">= 0.46.0"
+      configuration_aliases = snowflake.securityadmin
     }
   }
 }

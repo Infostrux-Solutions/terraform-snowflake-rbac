@@ -17,9 +17,7 @@ module "rbac" {
   source = "Infostrux-Solutions/terraform-snowflake-rbac"
 
   providers = {
-    snowflake.useradmin     = snowflake.useradmin
     snowflake.securityadmin = snowflake.securityadmin
-    snowflake.sysadmin      = snowflake.sysadmin
   }
 
   depends_on = [
@@ -33,9 +31,11 @@ module "rbac" {
 }
 ```
 
-The Snowflake Terraform provider uses private key authentication so this must be setup before you are able to deploy resources to the Snowflake account. More information on setting up a private key pair for Snowflake can be found here: https://docs.snowflake.com/en/user-guide/key-pair-auth.html
+### Snowflake Role
 
-The following is an example of a working `providers.tf` file to be used in the root module:
+Snowflake recommends using the SECURITYADMIN system role to grant or revoke privileges on objects in the account. This module requires that a provider alias is setup such that Terraform uses SECURITYADMIN to apply the resource grants.
+
+The following is an example of a working `providers.tf` file which specifies a user configurable role (default) and the SECURITYADMIN aliased role:
 
 ```hcl
 terraform {
@@ -58,30 +58,12 @@ provider "snowflake" {
 }
 
 provider "snowflake" {
-  alias                  = "useradmin"
-  account                = var.snowflake_account
-  username               = var.snowflake_username
-  private_key_path       = var.snowflake_private_key_path
-  private_key_passphrase = var.snowflake_private_key_passphrase
-  role                   = "USERADMIN"
-}
-
-provider "snowflake" {
   alias                  = "securityadmin"
   account                = var.snowflake_account
   username               = var.snowflake_username
   private_key_path       = var.snowflake_private_key_path
   private_key_passphrase = var.snowflake_private_key_passphrase
   role                   = "SECURITYADMIN"
-}
-
-provider "snowflake" {
-  alias                  = "sysadmin"
-  account                = var.snowflake_account
-  username               = var.snowflake_username
-  private_key_path       = var.snowflake_private_key_path
-  private_key_passphrase = var.snowflake_private_key_passphrase
-  role                   = "SYSADMIN"
 }
 ```
 
