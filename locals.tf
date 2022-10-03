@@ -4,7 +4,7 @@ locals {
   spec = yamldecode(file(var.spec_file_path))
 
   database_read_privileges = [
-         "USAGE",
+    "USAGE",
   ]
 
   database_write_privileges = [
