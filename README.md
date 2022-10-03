@@ -9,7 +9,6 @@ This module assumes the resources specified have been created in Snowflake by ot
 - [ ] Update schema privileges to use spec.yml
 - [ ] Update table privileges to use spec.yml
 - [ ] Add a CI pipeline
-- [ ] Convert this to a proper module and update the README's usage section
 
 ## Usage
 
