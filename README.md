@@ -4,13 +4,6 @@ Quickly deploy Snowflake RBAC resources using a simple configuration model.
 
 This module assumes the resources specified have been created in Snowflake by other means (e.g. through the Snowflake UI, using DDL commands or another Terraform project). In other words, no resources are created using this module, rather they are associated using their respective `snowflake_*_grant` Terraform resource blocks.
 
-## TODO
-
-- [x] Add a CI pipeline
-- [ ] Add a release pipeline
-- [ ] Update schema privileges to use spec.yml
-- [ ] Update table privileges to use spec.yml
-
 ## Usage
 
 ```hcl
