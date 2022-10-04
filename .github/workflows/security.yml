@@ -8,8 +8,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  terraform:
-    name: Terraform
+  security:
+    name: Security Checks
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
