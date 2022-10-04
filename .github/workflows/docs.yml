@@ -7,8 +7,8 @@ permissions:
   contents: write
 
 jobs:
-  terraform:
-    name: Terraform
+  docs:
+    name: Generate Docs
     runs-on: ubuntu-latest
     steps:
     - name: Checkout

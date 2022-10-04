@@ -7,8 +7,8 @@ permissions:
   contents: write
 
 jobs:
-  terraform:
-    name: Terraform
+  format:
+    name: Format Code
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
