@@ -10,7 +10,7 @@ on:
 jobs:
   validate:
     name: Validate PR Title
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Please look up the latest version from
       # https://github.com/amannn/action-semantic-pull-request/releases

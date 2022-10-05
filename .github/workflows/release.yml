@@ -11,7 +11,7 @@ on:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     # Skip running release workflow on forks
     if: github.repository_owner == 'Infostrux-Solutions'
     steps:
