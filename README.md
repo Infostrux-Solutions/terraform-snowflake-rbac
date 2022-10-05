@@ -181,7 +181,7 @@ No outputs.
 <!-- END_TF_DOCS -->
 
 ## Authors
-Module is maintained by [Infostrux Solutions](mailto:opensource@infostrux.com)
+Module is maintained by [Infostrux Solutions](mailto:opensource@infostrux.com) with help from [these awesome contributors](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/graphs/contributors).
 
 ## License
 Apache 2 Licensed. See [LICENSE](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/blob/main/LICENSE) for full details.
