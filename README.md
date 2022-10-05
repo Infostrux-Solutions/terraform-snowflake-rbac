@@ -30,7 +30,7 @@ module "rbac" {
 
 Snowflake recommends using the **SECURITYADMIN** system role to grant or revoke privileges on objects in the account. Though not required, this module should be configured with a provider alias that uses **SECURITYADMIN** to apply for the resource grants.
 
-The following is an example of a working 'providers.t' file which specifies a user-configurable role (default) and the **SECURITYADMIN** aliased role:
+The following is an example of a working `providers.tf` file which specifies a user-configurable role (default) and the **SECURITYADMIN** aliased role:
 
 ```hcl
 terraform {
@@ -78,7 +78,7 @@ Database permissions are abbreviated as `read` or `write` permissions, with this
 |            | write       | INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES |
 | Warehouses |             | USAGE, OPERATE, MONITOR                      |
 
-If no permission is specified for 'schemas' and 'tables', then the permissions set for the database are assumed. The 'warehouse' objects have a single permission type, so they are specified without a 'read' or 'write' qualifier (see below).
+If no permission is specified for `schemas` and `tables`, then the permissions set for the database are assumed. The `warehouse` objects have a single permission type, so they are specified without a `read` or `write` qualifier (see below).
 
 #### spec.yml
 
