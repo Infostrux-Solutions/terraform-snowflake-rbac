@@ -2,7 +2,7 @@
 
 Quickly deploy Snowflake RBAC resources using a simple configuration model.
 
-This module assumes the resources specified have been created in Snowflake by other means (e.g. through the Snowflake UI, using DDL commands or another Terraform project). In other words, no resources are created using this module, rather they are associated using their respective `snowflake_*_grant` Terraform resource blocks.
+This module assumes the resources specified have been created in Snowflake by other means (e.g. through the Snowflake UI, using DDL commands or another Terraform project). In other words, no resources are created using this module, instead, they are associated using their respective `snowflake_*_grant` Terraform resource blocks.
 
 ## Usage
 
@@ -28,9 +28,9 @@ module "rbac" {
 
 ### Snowflake Role
 
-Snowflake recommends using the **SECURITYADMIN** system role to grant or revoke privileges on objects in the account. Though not required, this module should be configured with a provider alias that uses **SECURITYADMIN** to apply the resource grants.
+Snowflake recommends using the **SECURITYADMIN** system role to grant or revoke privileges on objects in the account. Though not required, this module should be configured with a provider alias that uses **SECURITYADMIN** to apply for the resource grants.
 
-The following is an example of a working `providers.tf` file which specifies a user configurable role (default) and the **SECURITYADMIN** aliased role:
+The following is an example of a working 'providers.t' file which specifies a user-configurable role (default) and the **SECURITYADMIN** aliased role:
 
 ```hcl
 terraform {
@@ -64,7 +64,7 @@ provider "snowflake" {
 
 ### Configuring Resources
 
-The YAML specification file is used to define the relative permissions between databases, roles, users and warehouses in a Snowflake account.
+The YAML specification file defines the relative permissions between databases, roles, users and warehouses in a Snowflake account.
 
 Database permissions are abbreviated as `read` or `write` permissions, with this module generating the proper grants. The following table shows the association between this module's permissions and Snowflake grants.
 
@@ -78,7 +78,7 @@ Database permissions are abbreviated as `read` or `write` permissions, with this
 |            | write       | INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES |
 | Warehouses |             | USAGE, OPERATE, MONITOR                      |
 
-For `schemas` and `tables`, if no permission is specified, then the permissions specified for the database are assumed. The `warehouse` objects have a single permission type so they are specified without a `read` or `write` qualifier (see below).
+If no permission is specified for 'schemas' and 'tables', then the permissions set for the database are assumed. The 'warehouse' objects have a single permission type, so they are specified without a 'read' or 'write' qualifier (see below).
 
 #### spec.yml
 
@@ -178,4 +178,10 @@ No modules.
 ## Outputs
 
 No outputs.
+
+## Authors
+Module is maintained by [Infostrux Solutions](mailto:opensource@infostrux.com)
+
+## License
+Apache 2 Licensed. See [LICENSE](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/blob/main/LICENSE) for full details.
 <!-- END_TF_DOCS -->
