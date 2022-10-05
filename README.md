@@ -178,10 +178,10 @@ No modules.
 ## Outputs
 
 No outputs.
+<!-- END_TF_DOCS -->
 
 ## Authors
 Module is maintained by [Infostrux Solutions](mailto:opensource@infostrux.com)
 
 ## License
 Apache 2 Licensed. See [LICENSE](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/blob/main/LICENSE) for full details.
-<!-- END_TF_DOCS -->
