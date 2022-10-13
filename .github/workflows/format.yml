@@ -22,7 +22,7 @@ jobs:
         terraform_version: "1.0.0"
     - name: Format Code
       run: |
-        make tf-fmt
+        terraform fmt -recursive .
     - name: Commit Format Changes
       run: |
         git config user.name 'github-actions[bot]'
