@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/compare/v1.0.0...v1.0.1) (2022-10-14)
+
+
+### Documentation
+
+* Push a patch release for docs updates ([#21](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/issues/21)) ([7866341](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/commit/7866341bd2ad875c94fc4c7dbc7d9b4b8a9af1da))
+* Update README title to be consistent with other modules ([#20](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/issues/20)) ([929b9cb](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/commit/929b9cbcf7f2a1d58b8c5064edcea75d62b5b9d3))
+* Update usage instructions to correct source and versions ([#18](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/issues/18)) ([07470c0](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/commit/07470c0ce18f14ededb47de82c9ff93f79f02e19))
+
 ## [1.0.0](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/compare/v0.3.0...v1.0.0) (2022-10-05)
 
 
