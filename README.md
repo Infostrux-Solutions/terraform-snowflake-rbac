@@ -1,4 +1,4 @@
-# terraform-snowflake-rbac
+# Snowflake RBAC Terraform Module
 
 Quickly deploy Snowflake RBAC resources using a simple configuration model.
 
