@@ -16,7 +16,14 @@
     [
       "@semantic-release/release-notes-generator",
       {
-        "preset": "conventionalcommits"
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            { "type": "docs", "section": "Documentation", "hidden": false },
+            { "type": "feat", "section": "Features", "hidden": false },
+            { "type": "fix", "section": "Bug Fixes", "hidden": false }
+          ]
+        }
       }
     ],
     [
