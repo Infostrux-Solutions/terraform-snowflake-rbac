@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/compare/v1.0.1...v1.0.2) (2022-10-20)
+
+
+### Documentation
+
+* Remove APPENDIX section from the LICENSE file ([#25](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/issues/25)) ([2b48ecd](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/commit/2b48ecd0a727b140f27d4039576ae92aa0770ecb))
+
 ## [1.0.1](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/compare/v1.0.0...v1.0.1) (2022-10-14)
 
 
