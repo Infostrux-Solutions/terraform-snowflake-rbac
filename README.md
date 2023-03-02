@@ -167,6 +167,8 @@ No modules.
 | [snowflake_schema_grant.schema_write_grants](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/schema_grant) | resource |
 | [snowflake_table_grant.table_read_grants](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/table_grant) | resource |
 | [snowflake_table_grant.table_write_grants](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/table_grant) | resource |
+| [snowflake_view_grant.view_read_grants](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/view_grant) | resource |
+| [snowflake_view_grant.view_write_grants](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/view_grant) | resource |
 | [snowflake_warehouse_grant.warehouse_grants](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/warehouse_grant) | resource |
 
 ## Inputs
