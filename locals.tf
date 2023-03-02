@@ -41,7 +41,7 @@ locals {
     "TRUNCATE",
     "REFERENCES",
   ]
-  
+
   view_read_privileges = [
     "SELECT",
   ]
@@ -56,8 +56,8 @@ locals {
     "OPERATE",
     "MONITOR",
   ]
-  
-  
+
+
 
   # Resource Maps
 
