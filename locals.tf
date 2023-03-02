@@ -41,12 +41,23 @@ locals {
     "TRUNCATE",
     "REFERENCES",
   ]
+  
+  view_read_privileges = [
+    "SELECT",
+  ]
+
+  view_write_privileges = [
+    "SELECT",
+    "REFERENCES",
+  ]
 
   warehouse_privileges = [
     "USAGE",
     "OPERATE",
     "MONITOR",
   ]
+  
+  
 
   # Resource Maps
 
@@ -164,6 +175,45 @@ locals {
   table_write_grants = {
     for grant in flatten([
       for privilege in local.table_write_privileges : [
+        for database, spec in local.databases_with_database_write_privileges : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles         = [for role in spec.privileges.database.write.roles : upper(role)]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  ### Views
+
+  databases_with_view_privileges = {
+    for database, spec in local.databases_with_privileges : database => spec
+    if contains(keys(spec.privileges), "views")
+  }
+
+  databases_with_view_read_privileges = {
+    for database, spec in local.databases_with_view_privileges : database => spec
+    if contains(keys(spec.privileges.view), "read")
+  }
+
+  databases_with_view_write_privileges = {
+    for database, spec in local.databases_with_view_privileges : database => spec
+    if contains(keys(spec.privileges.view), "write")
+  }
+
+  view_read_grants = {
+    for grant in flatten([
+      for privilege in local.view_read_privileges : [
+        for database, spec in local.databases_with_database_read_privileges : {
+          database_name = upper(database)
+          privilege     = upper(privilege)
+          roles         = [for role in spec.privileges.database.read.roles : upper(role)]
+        }
+      ]
+  ]) : lower(replace("${grant.database_name}_${grant.privilege}", " ", "_")) => grant }
+
+  view_write_grants = {
+    for grant in flatten([
+      for privilege in local.view_write_privileges : [
         for database, spec in local.databases_with_database_write_privileges : {
           database_name = upper(database)
           privilege     = upper(privilege)
