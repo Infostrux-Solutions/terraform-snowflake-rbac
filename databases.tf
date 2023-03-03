@@ -59,3 +59,25 @@ resource "snowflake_table_grant" "table_write_grants" {
   on_future              = true
   with_grant_option      = false
 }
+
+# View Privileges
+
+resource "snowflake_view_grant" "view_read_grants" {
+  for_each               = local.view_read_grants
+  database_name          = each.value.database_name
+  privilege              = each.value.privilege
+  roles                  = each.value.roles
+  enable_multiple_grants = true
+  on_future              = true
+  with_grant_option      = false
+}
+
+resource "snowflake_view_grant" "view_write_grants" {
+  for_each               = local.view_write_grants
+  database_name          = each.value.database_name
+  privilege              = each.value.privilege
+  roles                  = each.value.roles
+  enable_multiple_grants = true
+  on_future              = true
+  with_grant_option      = false
+}
