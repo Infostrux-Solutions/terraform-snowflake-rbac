@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/compare/v1.0.2...v1.0.3) (2023-03-02)
+
+
+### Bug Fixes
+
+* Grant privileges on views ([#34](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/issues/34)) ([c853968](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/commit/c85396831528d94f2d06c5fbeecba1ce5f3698f1))
+
 ## [1.0.2](https://github.com/Infostrux-Solutions/terraform-snowflake-rbac/compare/v1.0.1...v1.0.2) (2022-10-20)
 
 
